@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Body, Controller, Get, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { WorkHoursService } from './work-hours.service';
 import { User } from 'src/auth/types/auth';
 import { CreateWorkHoursDto } from './dto/create-work-hour.dto';
@@ -63,5 +63,13 @@ export class WorkHoursController {
             workHour.userEmail = user.email;
             await this.workHoursService.update(workHour);
         });
+    }
+
+    @Delete(':date')
+    async delete(
+        @UserInfo() user: User,
+        @Param('date') date: string,
+    ): Promise<void> {
+        await this.workHoursService.delete(date, user.email);
     }
 }
