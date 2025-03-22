@@ -7,7 +7,6 @@ import { CreateWorkHoursDto } from './dto/create-work-hour.dto';
 import { User } from 'src/auth/types/auth';
 import { UpdateWorkHourDto } from './dto/update-work.hour.dto';
 import { calculateTotalTime, startTimeBeforeEndTime } from './work-hours.helper';
-import { CreateWeekWorkHoursDto } from './dto/create-week-work-hours.dto';
 
 @Injectable()
 export class WorkHoursService {
@@ -59,6 +58,21 @@ export class WorkHoursService {
         }
 
         return WorkHour;
+    }
+
+    async findByMonthAndYear(user: User, month: number, year: number): Promise<WorkHour[]> {
+        const workHours = await this.workHourModel.find({
+            userEmail: user.email,
+            date: {
+                $regex: new RegExp(`^\\d{2}-${('0' + month).slice(-2)}-${year}$`)
+            }
+        }).exec();
+
+        if (!workHours) {
+            throw new InternalServerErrorException('Non è stato possibile recuperare gli orari di lavoro per il mese e l\'anno specificati');
+        }
+
+        return workHours;
     }
 
     async update(updateWorkHourDto: UpdateWorkHourDto): Promise<WorkHour> {
